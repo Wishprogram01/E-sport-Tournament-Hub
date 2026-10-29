@@ -1,0 +1,72 @@
+{
+  "info": {
+    "name": "NexusArena API v1",
+    "description": "Endpoints for the NexusArena esports tournament hub. Run `php artisan migrate:fresh --seed` first; seeded IDs below match a fresh seed.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api/v1" },
+    { "key": "tournament_id", "value": "1" },
+    { "key": "match_id", "value": "6" },
+    { "key": "winning_team_id", "value": "3" },
+    { "key": "team_tag", "value": "SRG" }
+  ],
+  "item": [
+    {
+      "name": "Get tournament bracket",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": "{{base_url}}/tournaments/{{tournament_id}}/bracket"
+      }
+    },
+    {
+      "name": "Record game win",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"winning_team_id\": {{winning_team_id}}\n}" },
+        "url": "{{base_url}}/matches/{{match_id}}/score"
+      }
+    },
+    {
+      "name": "Get team roster",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": "{{base_url}}/teams/{{team_tag}}/roster"
+      }
+    },
+    {
+      "name": "Register team for tournament",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"team_id\": 1\n}" },
+        "url": "{{base_url}}/tournaments/{{tournament_id}}/register"
+      }
+    },
+    {
+      "name": "MVP leaderboard",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": {
+          "raw": "{{base_url}}/leaderboards/mvp?tournament_id={{tournament_id}}&limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["leaderboards", "mvp"],
+          "query": [
+            { "key": "tournament_id", "value": "{{tournament_id}}" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    }
+  ]
+}

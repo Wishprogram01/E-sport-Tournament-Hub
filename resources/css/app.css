@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Rajdhani', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Orbitron', 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+
+    --color-void: #05060f;
+    --color-panel: #0b0e1f;
+    --color-panel-light: #121735;
+    --color-neon-cyan: #22f3ff;
+    --color-neon-pink: #ff2bd6;
+    --color-neon-lime: #b6ff3b;
+    --color-neon-amber: #ffb020;
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    body {
+        background-color: var(--color-void);
+        background-image:
+            radial-gradient(circle at 15% 0%, rgb(255 43 214 / 0.16), transparent 40%),
+            radial-gradient(circle at 85% 10%, rgb(34 243 255 / 0.14), transparent 45%),
+            linear-gradient(rgb(34 243 255 / 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(34 243 255 / 0.04) 1px, transparent 1px);
+        background-size: auto, auto, 40px 40px, 40px 40px;
+        background-attachment: fixed;
+    }
+}
+
+@utility neon-border-cyan {
+    border-color: var(--color-neon-cyan);
+    box-shadow: 0 0 0 1px rgb(34 243 255 / 0.4), 0 0 18px rgb(34 243 255 / 0.35), inset 0 0 18px rgb(34 243 255 / 0.08);
+}
+
+@utility neon-border-pink {
+    border-color: var(--color-neon-pink);
+    box-shadow: 0 0 0 1px rgb(255 43 214 / 0.4), 0 0 18px rgb(255 43 214 / 0.35);
+}
+
+@utility neon-text-cyan {
+    color: var(--color-neon-cyan);
+    text-shadow: 0 0 10px rgb(34 243 255 / 0.7);
+}
+
+@utility neon-text-pink {
+    color: var(--color-neon-pink);
+    text-shadow: 0 0 10px rgb(255 43 214 / 0.7);
+}
+
+@utility clip-corner {
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
