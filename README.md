@@ -1,1 +1,134 @@
-# E-sport-Tournament-Hub
+<div align="center">
+  <h1>🏆 NexusArena: Esports Tournament & Team Hub</h1>
+  <p><strong>A decoupled tournament bracket engine, team roster manager, and live match statistics platform.</strong></p>
+
+  <!-- Dynamic Shields.io Badges -->
+  <p>
+    <img src="https://img.shields.io/badge/Laravel_/_Strapi-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Backend" />
+    <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="Database" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+    <img src="https://img.shields.io/badge/REST_API-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="API" />
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License" />
+  </p>
+
+  <p>
+    <a href="#-system-architecture">Architecture</a> •
+    <a href="#-database-schema">Database ER Diagram</a> •
+    <a href="#-api-endpoints">API Reference</a> •
+    <a href="#-quick-start">Quick Start</a>
+  </p>
+</div>
+
+---
+
+## ⚡ Key Engineering Features
+
+* **Automated Bracket Progression:** Entering a final match score triggers an event listener/webhook that automatically advances the winning team to the next bracket node (`Quarter-Finals` -> `Semi-Finals` -> `Grand Finals`).
+* **Role-Locked Roster Validation:** Enforces composition constraints (e.g., 5 active starters + 1 sixth-man substitute, verifying roles such as Jungler, Roamer, Gold Lane, EXP Lane, and Mid Lane before locking tournament registration).
+* **KDA & MVP Aggregation Engine:** Computes real-time Player Kill/Death/Assist ratios, Gold Per Minute (GPM), and team win-rates across Best-of-3 (Bo3) and Best-of-5 (Bo5) series.
+* **Headless API Ready:** Includes a full Postman collection (`docs/postman_collection.json`) for testing decoupled endpoints.
+
+---
+
+## 🏗️ System Architecture
+
+GitHub natively renders this workflow showing how match updates propagate from the admin panel to the live bracket UI:
+
+```mermaid
+graph LR
+    A[Tournament Admin] -->|Submits Match Result| B(API Controller / CMS Webhook)
+    B --> C{Series Complete?}
+    C -->|Yes: Team Reaches Win Threshold| D[Advance Winner to Next Bracket Node]
+    C -->|No: Next Game in Bo3/Bo5| E[Update Series Score & Player KDA]
+    D --> F[(PostgreSQL Database)]
+    E --> F
+    F --> G[Invalidate Cache & Broadcast to Frontend]
+```
+
+---
+
+## 🗄️ Database Schema (ER Diagram)
+
+```mermaid
+erDiagram
+    TOURNAMENTS ||--o{ MATCHES : hosts
+    TOURNAMENTS ||--o{ TEAMS : registers
+    TEAMS ||--o{ PLAYERS : rosters
+    MATCHES ||--o{ MATCH_GAMES : contains
+    PLAYERS ||--o{ PLAYER_STATS : records
+    MATCH_GAMES ||--o{ PLAYER_STATS : tracks
+
+    TOURNAMENTS {
+        uuid id PK
+        string name
+        string format "Single/Double Elimination"
+        decimal prize_pool
+        string status "Registration | Live | Completed"
+    }
+    TEAMS {
+        uuid id PK
+        string name
+        string tag "e.g.,NRG, ONIC, TODAK"
+        string logo_url
+        string region
+    }
+    PLAYERS {
+        uuid id PK
+        uuid team_id FK
+        string ign "In-Game Name"
+        string role "Jungler | Roamer | Mid | Gold | EXP"
+        boolean is_starter
+    }
+    MATCHES {
+        uuid id PK
+        uuid tournament_id FK
+        uuid team_a_id FK
+        uuid team_b_id FK
+        uuid winner_id FK
+        int round_number
+        int bracket_position
+        uuid next_match_id FK "Self-referencing pointer"
+        string best_of "Bo1 | Bo3 | Bo5"
+    }
+```
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/tournaments/{id}/bracket` | Returns full nested JSON bracket tree for rendering | Public |
+| `GET` | `/api/v1/teams/{tag}/roster` | Fetches active players, roles, and career KDA stats | Public |
+| `POST` | `/api/v1/tournaments/{id}/register` | Registers a team and validates 5-man role constraints | Team Captain |
+| `PATCH` | `/api/v1/matches/{id}/score` | Logs game winner and auto-advances bracket if series ends | Admin / Referee |
+| `GET` | `/api/v1/leaderboards/mvp` | Ranks tournament players by KDA, GPM, and kill participation | Public |
+
+---
+
+## 🚀 Quick Start (With Pre-Seeded Bracket Data)
+
+Clone the project and spin up a complete 8-team tournament bracket in under 2 minutes:
+
+```bash
+# 1. Clone the repository
+git clone [https://github.com/yourusername/nexus-esports-hub.git](https://github.com/yourusername/nexus-esports-hub.git)
+cd nexus-esports-hub
+
+# 2. Install dependencies & configure environment
+composer install && npm install
+cp .env.example .env
+php artisan key:generate
+
+# 3. Run migrations with the Esports Tournament Seeder
+php artisan migrate --seed
+
+# 4. Start the local server
+php artisan serve
+```
+
+### 🔐 Demo Credentials (Auto-Generated by Seeder)
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Tournament Marshal (Admin)** | `marshal@nexusarena.gg` | `password123` |
+| **Team Captain Demo** | `captain@todak.gg` | `password123` |
