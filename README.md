@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🏆 NexusArena: Esports Tournament & Team Hub</h1>
+  <h1>🏆 NexusArena: Esports Tournament & Team Hub | ON DEVELOPMENT</h1>
   <p><strong>A decoupled tournament bracket engine, team roster manager, and live match statistics platform.</strong></p>
 
   <!-- Dynamic Shields.io Badges -->
